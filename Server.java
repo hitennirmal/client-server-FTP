@@ -19,18 +19,21 @@ public class Server
 	                      // sending to client (pwrite object)
       OutputStream ostream = sock.getOutputStream(); 
       PrintWriter pwrite = new PrintWriter(ostream, true);
-
-                              // receiving from server ( receiveRead  object)
+         // receiving from server ( receiveRead  object)
       InputStream istream = sock.getInputStream();
       BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
-       
+                              
+
       String receiveMessage, sendMessage,rest,word,currentdir_temp, mkdir_temp;        
       String currentdir=System.getProperty("user.dir");     
       while(true)
     {
+       
+      
         receiveMessage = receiveRead.readLine();
         while (receiveMessage!=null)
         {
+        //System.out.println("Command form Client "+receiveMessage);
         int index = receiveMessage.indexOf(' ');
             if (index > -1) // Check if there is more than one word.
             { 
@@ -132,18 +135,66 @@ public class Server
             pwrite.println("Deletion successful.");         
             pwrite.flush();
             System.out.println("Deleted at"+ mkdir_temp);
+            mkdir_temp="null";
         }   
         else if (receiveMessage !=null && word.equals("get"))
-        {   
-            System.out.println("Need Code for get");
-            pwrite.println("This will be reply from get");             
+        {    mkdir_temp=currentdir+"/"+rest;
+            File myFile = new File(mkdir_temp);  
+            
+            byte[] mybytearray = new byte[(int) myFile.length()];  
+            try{
+            if(myFile.exists())
+                {
+                    FileInputStream fis = new FileInputStream(myFile);  
+                    BufferedInputStream bis = new BufferedInputStream(fis);  
+                    //bis.read(mybytearray, 0, mybytearray.length);  
+                    DataInputStream dis = new DataInputStream(bis);     
+                    dis.readFully(mybytearray, 0, mybytearray.length);  
+                    
+                    
+                    //Sending file name and file size to the server  
+                    DataOutputStream dos = new DataOutputStream(ostream);     
+                    dos.writeUTF(myFile.getName());     
+                    dos.writeLong(mybytearray.length);     
+                    dos.write(mybytearray, 0, mybytearray.length);     
+                    dos.flush();  
+                    
+                    //Sending file data to the server  
+                    ostream.write(mybytearray, 0, mybytearray.length); 
+
+                    
+                    ostream.flush();  
+                    dos.flush();
+                    bis.close();
+                    fis.close();
+                    dis.close();
+                    pwrite.flush();
+                    //os.close();
+                    //dos.close(); 
+                }
+            else
+            {
+                System.out.println("File not Found");
+            }
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
+            if((receiveMessage = receiveRead.readLine()) != null) //receive from server
+            {   
+                System.out.println(receiveMessage); // displaying at DOS prompt
+            }  
+            pwrite.println("Hi thanks");
             pwrite.flush();
+            ostream.flush();
+            mkdir_temp=null;
         }   
         else if (receiveMessage !=null && word.equals("put"))
         {   int bytesRead;  
             int current = 0;  
-            InputStream in = sock.getInputStream();  
-            DataInputStream clientData = new DataInputStream(in);   
+            //receving data from server
+            DataInputStream clientData = new DataInputStream(istream);
             String fileName = clientData.readUTF();
             mkdir_temp=currentdir+"/"+fileName;
             File statText = new File(mkdir_temp);    
@@ -157,14 +208,27 @@ public class Server
             }  
                
             // Closing the FileOutputStream handle
-            in.close();
+            //in.close();
+            //clientData.close();
+            output.flush();
             output.close();  
             System.out.println("File Transfered");
-            pwrite.println("Transfer Complete");             
+            pwrite.println("Transfer Complete"); 
+            receiveMessage = receiveRead.readLine();
+            if(receiveMessage!=null)
+            {
+                System.out.print("");
+            }            
             pwrite.flush();
         }   
+        /*else
+        {
+            System.out.println("Wrong command received  "+receiveMessage);
+            pwrite.println("Server is saying it is worng command" +receiveMessage);             
+            pwrite.flush();
+        }*/
         receiveMessage=null;
-      }         
+      }    
     }      
     }                    
 }                        
