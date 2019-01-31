@@ -42,7 +42,7 @@ public class Client
             }  
             pwrite.flush();
         }
-        else if (word.equals("put"))
+        else if (word.equals("get"))
         {
             pwrite.println(sendMessage); 
             if((receiveMessage = receiveRead.readLine()) != null) //receive from server
@@ -51,9 +51,41 @@ public class Client
             }  
             pwrite.flush();
         }
-        else if (word.equals("get"))
+        else if (word.equals("put"))
         {
             pwrite.println(sendMessage); 
+            File myFile = new File(rest);  
+            if(myFile.exists())
+            {
+            byte[] mybytearray = new byte[(int) myFile.length()];  
+            try{
+            FileInputStream fis = new FileInputStream(myFile);  
+            BufferedInputStream bis = new BufferedInputStream(fis);  
+            //bis.read(mybytearray, 0, mybytearray.length);  
+            
+            DataInputStream dis = new DataInputStream(bis);     
+            dis.readFully(mybytearray, 0, mybytearray.length);  
+            
+            OutputStream os = sock.getOutputStream();  
+            
+            //Sending file name and file size to the server  
+            DataOutputStream dos = new DataOutputStream(os);     
+            dos.writeUTF(myFile.getName());     
+            dos.writeLong(mybytearray.length);     
+            dos.write(mybytearray, 0, mybytearray.length);     
+            dos.flush();  
+            
+            //Sending file data to the server  
+            os.write(mybytearray, 0, mybytearray.length);  
+            os.flush();  
+            os.close();
+            dos.close(); 
+            }
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
             if((receiveMessage = receiveRead.readLine()) != null) //receive from server
             {
                 System.out.println(receiveMessage); // displaying at DOS prompt

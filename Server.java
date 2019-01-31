@@ -134,15 +134,33 @@ public class Server
             System.out.println("Deleted at"+ mkdir_temp);
         }   
         else if (receiveMessage !=null && word.equals("get"))
-        {
+        {   
             System.out.println("Need Code for get");
             pwrite.println("This will be reply from get");             
             pwrite.flush();
         }   
         else if (receiveMessage !=null && word.equals("put"))
-        {
-            System.out.println("Need Code for put");
-            pwrite.println("This will be reply from put");             
+        {   int bytesRead;  
+            int current = 0;  
+            InputStream in = sock.getInputStream();  
+            DataInputStream clientData = new DataInputStream(in);   
+            String fileName = clientData.readUTF();
+            mkdir_temp=currentdir+"/"+fileName;
+            File statText = new File(mkdir_temp);    
+            OutputStream output = new FileOutputStream(statText);     
+            long size = clientData.readLong();     
+            byte[] buffer = new byte[1024];     
+            while (size > 0 && (bytesRead = clientData.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1)     
+            {     
+                output.write(buffer, 0, bytesRead);     
+                size -= bytesRead;     
+            }  
+               
+            // Closing the FileOutputStream handle
+            in.close();
+            output.close();  
+            System.out.println("File Transfered");
+            pwrite.println("Transfer Complete");             
             pwrite.flush();
         }   
         receiveMessage=null;
