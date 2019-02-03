@@ -156,7 +156,7 @@ public class Server
                     DataOutputStream dos = new DataOutputStream(ostream);     
                     dos.writeUTF(myFile.getName());     
                     dos.writeLong(mybytearray.length);     
-                    //dos.write(mybytearray, 0, mybytearray.length);     
+                    dos.write(mybytearray, 0, mybytearray.length);     
                     dos.flush();  
                     
                     //Sending file data to the server  
