@@ -6,25 +6,30 @@ public class Client
 {
   public static void main(String[] args) throws Exception
   {
-     Socket sock = new Socket("127.0.0.1", 25000);
+     
                                // reading from keyboard (keyRead object)
      BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
                               // sending to client (pwrite object)
+     System.out.println("Enter Port number:");
+     int port=Integer.parseInt(keyRead.readLine());
+     Socket sock = new Socket(args[0],port);
      OutputStream ostream = sock.getOutputStream(); 
      PrintWriter pwrite = new PrintWriter(ostream, true);
 
                               // receiving from server ( receiveRead  object)
      InputStream istream = sock.getInputStream();
      BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+     
+     
 
-     System.out.println("Connected");
+     System.out.println("Connected to the server at port :"+ port);
 
      String sendMessage, receiveMessage, c, word="", rest; 
      sendMessage="" ;            
      while(true)
      {
         sendMessage = keyRead.readLine(); // keyboard reading
-        System.out.println("Message Sending to server...."+ sendMessage);
+        //System.out.println("Message Sending to server...."+ sendMessage);
             int index = sendMessage.indexOf(' ');
             if (index > -1) // Check if there is more than one word.
             { 
@@ -47,7 +52,10 @@ public class Client
         }
         else if (word.equals("get"))
         {
-            pwrite.println(sendMessage); 
+            pwrite.println(sendMessage);
+            String s=receiveRead.readLine();
+            if(s.equals("true"))
+            { 
             int bytesRead;  
             int current = 0;  
             //receving data from server
@@ -64,23 +72,29 @@ public class Client
                 output.write(buffer, 0, bytesRead);     
                 size -= bytesRead;     
             }  
-               
+            
             // Closing the FileOutputStream handle
             //in.close();
             //clientData.close();
             output.flush();
             output.close();  
             System.out.println("File Transfered");
-            pwrite.println("Transfer Complete"); 
-            receiveMessage = receiveRead.readLine();
+            pwrite.println("Transfer Complete");
+            } 
+            else
+            {
+                System.out.println("File not Found");
+            }
+            /*receiveMessage = receiveRead.readLine();
             if(receiveMessage!=null)
             {
                 System.out.print("");
-            }            
+            }           */ 
             pwrite.flush();
+
         }
         else if (word.equals("put"))
-        {
+        { 
             pwrite.println(sendMessage); 
             String currentdir_temp=System.getProperty("user.dir");  
             File myFile = new File(currentdir_temp+"/"+rest);  
@@ -88,7 +102,7 @@ public class Client
             byte[] mybytearray = new byte[(int) myFile.length()];  
             try{
             if(myFile.exists())
-                {
+                {   pwrite.println("true");
                     FileInputStream fis = new FileInputStream(myFile);  
                     BufferedInputStream bis = new BufferedInputStream(fis);  
                     //bis.read(mybytearray, 0, mybytearray.length);  
@@ -100,7 +114,7 @@ public class Client
                     DataOutputStream dos = new DataOutputStream(ostream);     
                     dos.writeUTF(myFile.getName());     
                     dos.writeLong(mybytearray.length);     
-                    dos.write(mybytearray, 0, mybytearray.length);     
+                    //dos.write(mybytearray, 0, mybytearray.length);     
                     dos.flush();  
                     
                     //Sending file data to the server  
@@ -115,26 +129,29 @@ public class Client
                     pwrite.flush();
                     //os.close();
                     //dos.close(); 
+                    if((receiveMessage = receiveRead.readLine()) != null) //receive from server
+                     {   
+                    System.out.println(receiveMessage); // displaying at DOS prompt
+                    } 
                 }
             else
-            {
+            {   pwrite.println("false");
                 System.out.println("File not Found");
             }
             }
             catch(Exception e)
-            {
+            {   //pwrite.println(e);
                 System.out.println(e);
             }
-            if((receiveMessage = receiveRead.readLine()) != null) //receive from server
-            {   
-                System.out.println(receiveMessage); // displaying at DOS prompt
-            }  
-            pwrite.println("Hi thanks");
+             
+            //pwrite.println("Hi thanks");
             pwrite.flush();
             ostream.flush();
+            currentdir_temp=null;
         }
         else if(word.equals("quit"))
         {
+            pwrite.println(sendMessage); 
             break;
         }
         else
@@ -146,4 +163,4 @@ public class Client
       }   
       sock.close();            
     }                    
-}                      
+}  
