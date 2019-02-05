@@ -109,11 +109,13 @@ public class Testserver
                 {
                     pwrite.println("Directory is created!");
                     System.out.println("Created at "+ mkdir_temp);
-                } else 
+                } 
+                }
+                else 
                 {
                     pwrite.println("Failed to create directory!");
                 }
-                 }
+             
                 mkdir_temp=null;
                 pwrite.flush();
             }   
@@ -153,7 +155,8 @@ public class Testserver
                 mkdir_temp="null";
             }   
             else if (receiveMessage !=null && word.equals("get"))
-            {    mkdir_temp=currentdir+"/"+rest;
+            {    
+                mkdir_temp=currentdir+"/"+rest;
                 File myFile = new File(mkdir_temp);  
 
                 byte[] mybytearray = new byte[(int) myFile.length()];  
