@@ -17,9 +17,9 @@ public class Testserver
       while(true)
       {
           
-          System.out.println("Server  ready at port"+port);
+          System.out.println("Server  ready at port :"+port);
           Socket sock = sersock.accept( );       
-          System.out.println("Connected")  ;                 
+          System.out.println("Server connected to the Client")  ;                 
                                   // reading from keyboard (keyRead object)
           
                               // sending to client (pwrite object)
@@ -51,8 +51,8 @@ public class Testserver
                 }
             if(receiveMessage != null && word.equals("pwd"))  
             {
-                //System.out.println("Need Code for PWD");
-                pwrite.println(currentdir);             
+                System.out.println("The current working directory is:" + currentdir);
+                pwrite.println("The current working directory is:" + currentdir);             
                 pwrite.flush();       
             }         
             else if(receiveMessage != null && word.equals("ls"))
@@ -77,9 +77,9 @@ public class Testserver
                 currentdir_temp=currentdir+ "/"+rest;
                 if (Files.isDirectory(Paths.get(currentdir_temp))) 
                 {
-                    pwrite.println("Directory Changed" );
+                    pwrite.println("Directory Changed to :" +currentdir_temp );
                     currentdir=currentdir_temp;
-                    System.out.println(currentdir);
+                    System.out.println("Directory Changed to :" +currentdir_temp);
                 }
                 else
                 {
@@ -93,9 +93,9 @@ public class Testserver
             {
                // System.out.println("Need Code for cd..");
                currentdir=currentdir.substring(0,currentdir.lastIndexOf('/'));
-                pwrite.println("Directory Changed");             
+                pwrite.println("Directory Changed:" + currentdir);             
                 pwrite.flush();
-                System.out.println(currentdir);
+                System.out.println("Directory changed :" + currentdir);
 
             }
             else if (receiveMessage !=null && word.equals("mkdir"))
@@ -235,6 +235,7 @@ public class Testserver
                     System.out.print("");
                 }            
                 pwrite.flush();
+                mkdir_temp=null;
             }
             else if (receiveMessage !=null && word.equals("quit"))
             {
@@ -243,7 +244,7 @@ public class Testserver
                 ostream.close();
                 sock.close();
                 input = false;
-                System.out.println("Waiting to release the port");
+                System.out.println("Coonection closed!");
                 //TimeUnit.SECONDS.sleep(10);
                 break;
 

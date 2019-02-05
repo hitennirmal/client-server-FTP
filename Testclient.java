@@ -22,7 +22,7 @@ public class Testclient
      
      
 
-     System.out.println("Connected");
+     System.out.println("Connected to the server at port :"+ port);
 
      String sendMessage, receiveMessage, c, word="", rest; 
      sendMessage="" ;            
